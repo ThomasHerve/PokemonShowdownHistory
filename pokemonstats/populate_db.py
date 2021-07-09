@@ -84,9 +84,8 @@ def populate():
     pokemon_list = []
 
     c = 1
-    m = Month.objects.latest('order').order
-    if m:
-        c = m
+    if len(Month.objects.all()) > 0:
+        c = Month.objects.latest('order').order
 
     for month in month_list:
         if Month.objects.filter(url=month).count() == 0:
