@@ -44,10 +44,8 @@ def populate_pokemon(tier_url, tier_id):
 
 
 count = 0
-max_count = Tier.objects.latest('id').id
-if max_count:
-    count = max_count
-
+if len(Tier.objects.all()) > 0:
+    count = Tier.objects.latest('id').id
 
 def count_id():
     global count
