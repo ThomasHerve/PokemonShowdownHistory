@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/fontawesome.min.css">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        /* Add a black background color to the top navigation bar */
+        .topnav {
+            overflow: hidden;
+            background-color: #e9e9e9;
+        }
+
+        /* Style the search box inside the navigation bar */
+        .search-container input[type=text] {
+            padding: 6px;
+            border: none;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            margin-right: 0px;
+            font-size: 17px;
+            width: 20rem;
+            height: 2em;
+        }
+
+        .search-container button {
+            margin-top: 8px;
+            margin-bottom: 8px;
+            text-decoration: none;
+            height: 2em;
+            width: 2em;
+        }
+
+        .search-container button:hover {
+            background: #ccc;
+        }
+
+        .search-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
+
+        .home {
+            float: left;
+            width: 2em;
+            height: 2em;
+            border: none;
+            background-color: #e9e9e9;
+            text-decoration: none;
+            margin-top: 0.5rem;
+        }
+
+        .home:hover i {
+            color: grey;
+        }
+
+        .search {
+            display: flex;
+            flex-direction: column;
+            justify-content: left;
+
+        }
+
+        /* Auto complete */
+        .auto-complete ul {
+            position: absolute;
+            background-color: white;
+            border: 1px solid black;
+            width: 20rem;
+            margin-top: -8px;
+            list-style-type: none;
+            padding: 0; /* Remove padding */
+        }
+
+        .auto-complete li {
+            cursor: pointer;
+        }
+
+        .auto-complete li div {
+            margin-left: 4px;
+        }
+
+        .auto-complete li:hover {
+            background-color: #e9e9e9;
+        }
+
+    </style>
+</head>
+<body>
+<div class="topnav">
+    <button class="home" onclick="home()">
+        <i class="fa fa-home fa-lg"></i>
+    </button>
+    <div class="search-container">
+        <div class="search">
+            <input type="text" placeholder="Search.." id="inputId">
+            <div class="auto-complete" id="auto-complete"></div>
+        </div>
+        <button id="btn" onclick="go()"><i class="fa fa-search"></i></button>
+    </div>
+</div>
+<script>
+    let p_list = '{{ pokemon_list }}'.split(',')
+    let input = document.getElementById("inputId")
+    let autoComplete = document.getElementById("auto-complete")
+    let btn = document.getElementById("btn")
+    let currentPokemon = ""
+    input.addEventListener('keyup', () => {
+        let text = input.value.toLowerCase()
+        if (text.length === 0) {
+            autoComplete.innerHTML = ""
+        } else {
+            update()
+        }
+    })
+
+    btn.disabled = true
+    let update = () => {
+        let list = "<ul>"
+        let i = 0
+        btn.disabled = true
+        p_list.forEach((pokemon) => {
+            if (pokemon.toLowerCase().indexOf(input.value.toLowerCase()) === 0) {
+                if (pokemon.toLowerCase() !== input.value.toLowerCase()) {
+                    if (i < 10) {
+                        list += `<li><div onclick=complete('${pokemon}')>${pokemon}</div></li>`
+                    }
+                    i++
+                } else {
+                    btn.disabled = false
+                    currentPokemon = pokemon
+                }
+            }
+        })
+        list += "</ul>"
+        if (i > 0) {
+            autoComplete.innerHTML = list
+        } else {
+            autoComplete.innerHTML = ""
+        }
+    }
+
+    let complete = (pokemon) => {
+        input.value = pokemon
+        autoComplete.innerHTML = ""
+        btn.disabled = false
+        currentPokemon = pokemon
+    }
+
+    let go = () => {
+        window.location = "{% url 'pokemon' 1234 %}".replace(/1234/, currentPokemon);
+    }
+
+    let home = () => {
+        window.location = "home"
+    }
+
+
+</script>
+{% block content %}{% endblock %}
+</body>
+</html>

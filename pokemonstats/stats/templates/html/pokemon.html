@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block content %}
+    <style>
+        body {
+            overflow-x: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .main {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .main img {
+            width: 10rem;
+            height: 10rem;
+        }
+
+        .tier-buttons {
+            display: flex;
+            flex-direction: row;
+        }
+
+        button {
+            width: 5rem;
+            height: 2.5rem;
+            background-color: lightgrey;
+            color: black;
+            border: solid 1px black;
+        }
+    </style>
+
+    <h1>{{ name|title }}</h1>
+    <div class="main">
+        <div style="margin-top: -30px; margin-bottom: 30px">
+            <a href="https://www.smogon.com/dex/ss/pokemon/{{ name }}/">
+                <img src="https://img.pokemondb.net/sprites/home/normal/{{ url }}.png">
+            </a>
+        </div>
+        <br/>
+        <h2>Tier of {{ name|title }} for each month it was available</h2>
+        <div id="graphDiv" style="width: 100%"></div>
+        <div style="display: flex; flex-direction: row; margin-bottom: 5rem">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-top: 0.2rem"></i>
+            &nbsp;If the pokemon have a really low use rate the tiers may be higher than the reality.
+            <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-top: 0.2rem"></i>
+        </div>
+        <h2>Usage of {{ name|title }}</h2>
+        <div class="tier-buttons">
+            <button id="ubers" onclick="mainButton('ubers')">UBERS</button>
+            <button id="ou" onclick="mainButton('ou')">OU</button>
+            <button id="uu" onclick="mainButton('uu')">UU</button>
+            <button id="ru" onclick="mainButton('ru')">RU</button>
+            <button id="nu" onclick="mainButton('nu')">NU</button>
+        </div>
+        <h3>Elo</h3>
+        <div class="tier-buttons">
+            <button id="0" onclick="mainButtonElo('0')">0</button>
+            <button id="1500" onclick="mainButtonElo('1500')">1500</button>
+            <button id="1600" onclick="mainButtonElo('1600')">1600</button>
+            <button id="1800" onclick="mainButtonElo('1800')">1800</button>
+        </div>
+        <div id="graphDivUsage" style="width: 100%"></div>
+    </div>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        // Tiers
+        let tier_list = '{{ tiers }}'.split(',')
+        // Data
+        let xData = []
+        let yData = []
+        tier_list.forEach((value) => {
+            const month_name = value.split(" ")
+            if (!/[A-Z]/i.test(month_name[0])) {
+                xData.push(month_name[0])
+                yData.push(month_name[1])
+            }
+        })
+        let trace1 = {
+            x: xData,
+            y: yData,
+            type: 'scatter'
+        };
+
+        Plotly.newPlot('graphDiv', [trace1]);
+        let x = document.getElementsByClassName("ytick");
+        for (let i = 0; i < x.length; i++) {
+            let v = x[i].childNodes[0].innerHTML
+            switch (v) {
+                case "5":
+                    x[i].childNodes[0].innerHTML = 'ubers'
+                    break;
+                case "4":
+                    x[i].childNodes[0].innerHTML = 'ou'
+                    break;
+                case "3":
+                    x[i].childNodes[0].innerHTML = 'uu'
+                    break;
+                case "2":
+                    x[i].childNodes[0].innerHTML = 'ru'
+                    break;
+                case "1":
+                    x[i].childNodes[0].innerHTML = 'nu'
+                    break;
+                default:
+                    x[i].childNodes[0].innerHTML = ''
+                    break;
+            }
+        }
+
+        // Buttons
+        mainbutton = document.getElementById("ou")
+        mainbutton.style = "background-color: grey;"
+        mainid = "ou"
+
+        function mainButton(id) {
+            if (mainid != id) {
+                mainbutton.style = "background-color: lightgrey;"
+                mainid = id
+                mainbutton = document.getElementById(id)
+                mainbutton.style = "background-color: grey;"
+                plotUsage()
+            }
+        }
+
+        mainbuttonelo = document.getElementById("1800")
+        mainbuttonelo.style = "background-color: grey;"
+        mainidelo = "1800"
+
+
+        function mainButtonElo(id) {
+            if (mainidelo != id) {
+                mainbuttonelo.style = "background-color: lightgrey;"
+                mainidelo = id
+                mainbuttonelo = document.getElementById(id)
+                mainbuttonelo.style = "background-color: grey;"
+                plotUsage()
+            }
+        }
+
+
+        // Usages
+        let usages = {
+            'ubers': {
+                0: '{{ usages.ubers.0 }}'.split(','),
+                1500: '{{ usages.ubers.1500 }}'.split(','),
+                1600: '{{ usages.ubers.1600 }}'.split(','),
+                1800: '{{ usages.ubers.1800 }}'.split(',')
+            },
+            'ou': {
+                0: '{{ usages.ou.0 }}'.split(','),
+                1500: '{{ usages.ou.1500 }}'.split(','),
+                1600: '{{ usages.ou.1600 }}'.split(','),
+                1800: '{{ usages.ou.1800 }}'.split(',')
+            },
+            'uu': {
+                0: '{{ usages.uu.0 }}'.split(','),
+                1500: '{{ usages.uu.1500 }}'.split(','),
+                1600: '{{ usages.uu.1600 }}'.split(','),
+                1800: '{{ usages.uu.1800 }}'.split(',')
+            },
+            'ru': {
+                0: '{{ usages.ru.0 }}'.split(','),
+                1500: '{{ usages.ru.1500 }}'.split(','),
+                1600: '{{ usages.ru.1600 }}'.split(','),
+                1800: '{{ usages.ru.1800 }}'.split(',')
+            },
+            'nu': {
+                0: '{{ usages.nu.0 }}'.split(','),
+                1500: '{{ usages.nu.1500 }}'.split(','),
+                1600: '{{ usages.nu.1600 }}'.split(','),
+                1800: '{{ usages.nu.1800 }}'.split(',')
+            }
+        }
+
+        let trace2 = null
+        plotUsage()
+        function plotUsage() {
+            let xData = []
+            let yData = []
+            usages[mainid][mainidelo].forEach((value) => {
+                const month_name = value.split(" ")
+                if (!/[A-Z]/i.test(month_name[0])) {
+                    xData.push(month_name[0])
+                    yData.push(month_name[1])
+                }
+            })
+            trace2 = {
+                x: xData,
+                y: yData,
+                type: 'scatter'
+            };
+
+            Plotly.newPlot('graphDivUsage', [trace2]);
+        }
+
+        window.addEventListener("resize", ()=>{
+            Plotly.newPlot('graphDiv', [trace1]);
+            if(trace2) Plotly.newPlot('graphDivUsage', [trace2]);
+        })
+    </script>
+{% endblock %}

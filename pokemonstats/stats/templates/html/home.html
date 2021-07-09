@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+    <style>
+        .main {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .main img {
+            width: 15rem;
+            height: 17rem;
+        }
+
+        .main a {
+            margin-top: 3rem;
+        }
+
+        .main h1 {
+            margin-top: 5rem;
+        }
+
+        .main * {
+            align-self: center;
+            align-content: center;
+        }
+    </style>
+    <div class="main">
+        <h1>Welcome on showdown history</h1>
+        <a href="https://www.smogon.com">
+            <img src="https://fsmedia.imgix.net/88/0b/f7/a8/c134/4e11/9616/ea4b6b1de5ca/smogon-is-a-great-resource-for-all-things-vgc.png?dpr=2&auto=format%2Ccompress&w=650">
+        </a>
+        <p>
+            Search for any pokemon in the search bar above to get its history in pokemon showdown.
+        </p>
+        <p>
+            All the data of this website come from <a href="https://www.smogon.com/stats/">the smogon stats</a>
+        </p>
+        <p>
+            Made by Thomas HERVE
+        </p>
+
+    </div>
+{% endblock %}
